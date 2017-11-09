@@ -1,0 +1,36 @@
+# Default values for miqp-ui-dep.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+##################Names of files and Applications################
+Depname: miqp-server-dep
+Appname: miqp-server
+Svcname: miqp-server-svc
+Ingname: miqp-ing
+##################################################################
+replicaCount: 2
+strategy: 
+  type: RollingUpdate
+  rollingUpdate:
+     maxSurge: 1
+     maxUnavailable: 1
+minReadySeconds: 5
+nodeSelector:
+       role: nginxplus
+image:
+  repository: 230367374156.dkr.ecr.us-east-1.amazonaws.com/miqp-devops
+  tag: miqpserver_2sep
+  pullPolicy: IfNotPresent
+service:
+  name: miqp-ui-svc
+  externalPort: 80
+  internalPort: 8081
+secret: 
+  name: miqp-ssl
+ingress:
+  enabled: true
+  hosts:
+    - kubernetes-helm.mediaiqdigital.com
+  tls:
+    - secretName: miqp-ssl
+      hosts: 
+        - kubernetes-helm.mediaiqdigital.com

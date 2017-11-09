@@ -1,0 +1,4 @@
+apiVersion: v1
+description: A Helm chart for miqp-ui
+name: miqp-ui-dep
+version: 0.1.0

@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: {{ .Values.Depname }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+     matchLabels:
+        app: {{ .Values.Appname }}
+  strategy:
+    type: {{ .Values.strategy.type }}
+    rollingUpdate: 
+       maxSurge: {{ .Values.strategy.rollingUpdate.maxSurge }}
+       maxUnavailable: {{ .Values.strategy.rollingUpdate.maxUnavailable }} 
+  minReadySeconds: {{ .Values.minReadySeconds }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.Appname }}
+    spec:
+      nodeSelector:
+            role: {{ .Values.nodeSelector.role }}
+      containers:
+      - name: {{ .Values.Appname }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy}}
+        ports:
+        - containerPort: {{ .Values.service.internalPort}}
+        volumeMounts:
+        - name: {{ .Values.volumeMounts.name }}
+          mountPath: /opt/miqpefs
+  volumeClaimTemplates:
+  {{- if .Values.persistence.enabled }}
+  - metadata:
+      name: {{ .Values.persistence.volume.name }}
+    spec:
+      accessModes: {{ .Values.persistence.volume.accessModes }}
+      storageClassName: {{ .Values.persistence.volume.storageClass }}
+      resources:
+        requests:
+          storage: {{ .Values.persistence.volume.storageSize }}
+  {{- else }}
+    emptyDir: {}
+  {{ end }}
+
